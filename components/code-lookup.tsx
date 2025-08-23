@@ -8,11 +8,13 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Search, ExternalLink } from "lucide-react"
 import { validatePodcastCode, formatPodcastCode } from "@/lib/code-utils"
+import { useRouter } from 'next/navigation'
 
 export function CodeLookup() {
   const [code, setCode] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const router = useRouter()
 
   const handleLookup = async () => {
     const formattedCode = formatPodcastCode(code)
@@ -31,7 +33,7 @@ export function CodeLookup() {
 
       if (data.success && data.podcast) {
         // Redirect to podcast page
-        window.open(`/podcast/${formattedCode}`, "_blank")
+        router.push(`/podcast/${formattedCode}`)
       } else {
         setError("Podcast not found. Please check your code and try again.")
       }
@@ -60,7 +62,7 @@ export function CodeLookup() {
             placeholder="ABC123"
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             maxLength={6}
             className="font-mono text-center text-lg tracking-wider"
           />
@@ -69,7 +71,7 @@ export function CodeLookup() {
             disabled={loading || code.length !== 6}
             className="bg-primary hover:bg-primary/90"
           >
-            {loading ? <Search className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
+            {loading ? <Search className="h-4 w-4 animate-pulse" /> : <ExternalLink className="h-4 w-4" />}
           </Button>
         </div>
 
