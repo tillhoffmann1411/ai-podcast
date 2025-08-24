@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Work_Sans, Open_Sans } from "next/font/google"
+import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 
 const workSans = Work_Sans({
@@ -16,9 +17,8 @@ const openSans = Open_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "AI Podcast Generator - City History",
-  description: "Generate AI-powered podcasts about city history",
-  generator: "v0.app",
+  title: "AI City Podcast Generator",
+  description: "Generate AI-powered podcasts about cities around the world",
 }
 
 export default function RootLayout({
@@ -37,7 +37,10 @@ html {
 }
         `}</style>
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster />
+      </body>
     </html>
   )
 }

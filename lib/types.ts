@@ -10,6 +10,14 @@ export interface Podcast {
   error_message?: string
   created_at: string
   updated_at: string
+  length: number
+  language: "English" | "German"
+  references: {
+    url: string,
+    date: string,
+    title: string,
+    last_updated: string,
+  }[]
 }
 
 export interface PodcastGenerationRequest {

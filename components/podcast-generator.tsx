@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider"
 import { Loader2, Mic, Copy, ExternalLink } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { Label } from './ui/label'
 
 interface GenerationResult {
   code: string
@@ -23,7 +24,15 @@ export function PodcastGenerator() {
   const [length, setLength] = useState<number[]>([6])
   const [isGenerating, setIsGenerating] = useState(false)
   const [result, setResult] = useState<GenerationResult | null>(null)
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false)
   const { toast } = useToast()
+
+  const handleCityChange = (value: string) => {
+    setCityName(value)
+    if (value.trim() && !showAdvancedOptions) {
+      setShowAdvancedOptions(true)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -98,106 +107,134 @@ export function PodcastGenerator() {
         <CardContent className="p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label htmlFor="city" className="font-body text-sm font-medium text-foreground">
+              <Label htmlFor="city">
                 Enter City Name
-              </label>
+              </Label>
               <Input
                 id="city"
                 type="text"
                 placeholder="e.g., Paris, Tokyo, New York..."
                 value={cityName}
-                onChange={(e) => setCityName(e.target.value)}
+                onChange={(e) => handleCityChange(e.target.value)}
                 className="text-lg py-6 bg-input border-border focus:ring-ring"
                 disabled={isGenerating}
               />
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="language" className="font-body text-sm font-medium text-foreground">
-                Select Language
-              </label>
-              <Select value={language} onValueChange={setLanguage} disabled={isGenerating}>
-                <SelectTrigger className="text-lg py-6 bg-input border-border">
-                  <SelectValue placeholder="Choose language..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="German">German</SelectItem>
-                  <SelectItem value="English">English</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Advanced Options - Slide in when city is entered */}
+            {showAdvancedOptions && (
+              <div className="space-y-6 animate-in slide-in-from-top-2 duration-300">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Language Selection */}
+                  <div className="space-y-2">
+                    <Label htmlFor="language">
+                      Language
+                    </Label>
+                    <Select value={language} onValueChange={setLanguage} disabled={isGenerating}>
+                      <SelectTrigger className="py-6 bg-input border-border">
+                        <SelectValue placeholder="Choose language..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="English">🇺🇸 English</SelectItem>
+                        <SelectItem value="German">🇩🇪 German</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-            <div className="space-y-4">
-              <label htmlFor="length" className="font-body text-sm font-medium text-foreground">
-                Podcast Length: {length[0]} minutes
-              </label>
-              <div className="px-2">
-                <Slider
-                  value={length}
-                  onValueChange={setLength}
-                  max={15}
-                  min={2}
-                  step={1}
-                  className="w-full"
-                  disabled={isGenerating}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                  <span>2 min</span>
-                  <span>15 min</span>
+                  {/* Length Selection */}
+                  <div className="space-y-3">
+                    <Label htmlFor="length">
+                      Duration: {length[0]} minutes
+                    </Label>
+                    <div className="px-2">
+                      <Slider
+                        value={length}
+                        onValueChange={setLength}
+                        max={15}
+                        min={2}
+                        step={1}
+                        className="w-full"
+                        disabled={isGenerating}
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                        <span>2 min</span>
+                        <span>15 min</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <Button
-              type="submit"
-              disabled={isGenerating || !cityName.trim() || !language}
-              className="w-full py-6 text-lg font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Generating Podcast...
-                </>
-              ) : (
-                <>
-                  <Mic className="mr-2 h-5 w-5" />
-                  Generate Podcast
-                </>
-              )}
-            </Button>
+                {/* Generate Button */}
+                <Button
+                  type="submit"
+                  disabled={isGenerating || !cityName.trim() || !language}
+                  className="w-full py-6 text-lg font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Generating Podcast...
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="mr-2 h-5 w-5" />
+                      Generate Podcast
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </form>
         </CardContent>
       </Card>
 
       {/* Generation Result */}
       {result && (
-        <Card className="bg-accent/5 border-accent/20">
+        <Card className="bg-gradient-to-r from-violet-50 to-cyan-50 dark:from-violet-950/20 dark:to-cyan-950/20 border-violet-200 dark:border-violet-800 shadow-xl animate-in slide-in-from-bottom-4 duration-500">
           <CardContent className="p-8 text-center">
-            <div className="space-y-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-accent/10 rounded-full mb-4">
-                <Mic className="h-8 w-8 text-accent" />
+            <div className="space-y-6">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full mb-4">
+                <Mic className="h-10 w-10 text-white" />
               </div>
 
-              <h3 className="font-heading text-2xl font-bold text-foreground">Podcast Generated!</h3>
-
-              <p className="font-body text-muted-foreground">
-                Your podcast about <strong>{result.city_name}</strong> is ready
-              </p>
-
-              <div className="bg-background border border-border rounded-lg p-4 max-w-sm mx-auto">
-                <p className="font-body text-sm text-muted-foreground mb-2">Your unique code:</p>
-                <div className="font-mono text-2xl font-bold text-foreground tracking-wider">{result.code}</div>
+              <div className="space-y-2">
+                <h3 className="font-heading text-3xl font-bold bg-gradient-to-r from-violet-600 to-cyan-600 bg-clip-text text-transparent">
+                  🎉 Podcast Created!
+                </h3>
+                <p className="font-body text-lg text-muted-foreground">
+                  Your podcast about <strong>{result.city_name}</strong> is being generated
+                </p>
               </div>
 
-              <div className="flex gap-3 justify-center">
-                <Button onClick={copyCode} variant="outline" className="border-border hover:bg-muted bg-transparent">
+              <div className="bg-white/80 dark:bg-background/80 backdrop-blur-sm border border-violet-200 dark:border-violet-800 rounded-xl p-6 max-w-sm mx-auto">
+                <p className="font-body text-sm text-muted-foreground mb-3">Your unique access code:</p>
+                <div className="font-mono text-3xl font-bold bg-gradient-to-r from-violet-600 to-cyan-600 bg-clip-text text-transparent tracking-wider">
+                  {result.code}
+                </div>
+              </div>
+
+              <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 max-w-md mx-auto">
+                <p className="text-amber-800 dark:text-amber-200 text-sm">
+                  ⏱️ Generation typically takes 1-5 minutes. You'll be able to listen once it's ready!
+                </p>
+              </div>
+
+              <div className="flex gap-4 justify-center">
+                <Button
+                  onClick={copyCode}
+                  variant="outline"
+                  className="border-violet-200 dark:border-violet-800 hover:bg-violet-50 dark:hover:bg-violet-950/20 bg-white/80 dark:bg-background/80"
+                >
                   <Copy className="mr-2 h-4 w-4" />
                   Copy Code
                 </Button>
 
-                <Button onClick={openPodcast} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                <Button
+                  onClick={openPodcast}
+                  className="bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-700 hover:to-cyan-700 text-white shadow-lg"
+                >
                   <ExternalLink className="mr-2 h-4 w-4" />
-                  Listen Now
+                  Check Status
                 </Button>
               </div>
             </div>

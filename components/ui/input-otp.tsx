@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { OTPInput, OTPInputContext } from "input-otp"
+import { OTPInput, OTPInputContext, REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
 import { MinusIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -15,6 +15,7 @@ function InputOTP({
 }) {
   return (
     <OTPInput
+      pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
       data-slot="input-otp"
       containerClassName={cn(
         "flex items-center gap-2 has-disabled:opacity-50",
